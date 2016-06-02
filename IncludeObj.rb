@@ -1,41 +1,40 @@
 class IncludeObj
   attr_reader:name
   attr_reader:size
+  attr_reader:base_size
   attr_reader:path
+  attr_reader:includes
   def  initialize(file, path)
-    @include = []
+    @includes = []
     tmp = ""
     tmp<< file
     tmp.slice!(path)
     @name = tmp[1..tmp.length]
     @path= file
+    @base_size = File.size(@path);
     @size = getSize() 
   end
 
   def has(include)
-    @include.include?(include)
-  end
-
-  def getInclude(list)
-    list.concat(@include)
+    @includes.include?(include)
   end
 
   def dump()
     puts "=============#{@name}================================"
-    puts "has #{@include.size} include "
+    puts "has #{@includes.size} include "
     puts "size is #{@size} "
     puts "path is #{@path} "
   end
 
   def add(includeObj)
-    @include<< includeObj
+    @includes << includeObj
   end
 
   private
   def getSize()
     list = []
-    size = File.size(@path)
-    @include.each do |file| 
+    size = @base_size
+    @includes.each do |file| 
       list.concat(getInclude(list))
     end
     list.uniq!
