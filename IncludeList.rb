@@ -21,6 +21,9 @@ class IncludeList
   end
 
   def buildList(searchPath)
+    if not Dir.exist? searchPath
+      return
+    end
     files = Find.find(searchPath).select{ |file| (file =~ /(\.h)|(\.tcc)$/ ) }
     files.each do |file|
       obj = IncludeObj.new(file, searchPath);

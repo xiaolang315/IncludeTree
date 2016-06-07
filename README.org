@@ -1,0 +1,13 @@
+* TO DO
+ * auto load system include
+ * local save paser info
+ * display in different way
+* Introduction
+IncludeTree is a tool analyse C++ cpps, it can be work with given include Search Path . the result show all cpp include use status, which is useful, which is not necessary .it also display all the include cost . help to analyse the compile time of the cpps 
+* Qucik Start
+config config.ymal
+#+BEGIN_SRC ymal
+cmake_path: 
+cpp_search_path:
+cpp_output_path:
+#+END_SRC

@@ -1,6 +1,5 @@
 class IncludeObj
   attr_reader:name
-  attr_reader:size
   attr_reader:base_size
   attr_reader:path
   attr_reader:includes
@@ -12,7 +11,6 @@ class IncludeObj
     @name = tmp[1..tmp.length]
     @path= file
     @base_size = File.size(@path);
-    @size = getSize() 
   end
 
   def has(include)
@@ -22,7 +20,7 @@ class IncludeObj
   def dump()
     puts "=============#{@name}================================"
     puts "has #{@includes.size} include "
-    puts "size is #{@size} "
+    puts "size is #{@base_size} "
     puts "path is #{@path} "
   end
 
@@ -30,17 +28,4 @@ class IncludeObj
     @includes << includeObj
   end
 
-  private
-  def getSize()
-    list = []
-    size = @base_size
-    @includes.each do |file| 
-      list.concat(getInclude(list))
-    end
-    list.uniq!
-    list.each do |file| 
-      size += file.size
-    end
-    return size 
-  end
 end
