@@ -1,10 +1,9 @@
 require_relative "IncludeList.rb" 
 
-class CppInfo
+class PaserInfo
   attr_reader:name
   attr_reader:size
   attr_reader:path
-  attr_reader:includes
   attr_reader:sum
 
   def  initialize(file, list)
@@ -27,7 +26,7 @@ class CppInfo
 
   private
   def paserInclude(list)
-    @includes = list.getRelLines(readInclude(@path))
+    @includes = list.getRelLines(@path)
 
     list = []
     @includes.each do |line| 

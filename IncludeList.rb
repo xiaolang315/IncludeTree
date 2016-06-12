@@ -1,17 +1,13 @@
 require_relative "IncludeObj.rb" 
-require_relative "CppInclude.rb" 
+require_relative "UsedInclude.rb" 
 require "find"
 
 class IncludeList
   def  initialize(searchPath)
     @list = {}
     @searchPath = searchPath
-    @searchPath.each do |path| 
-      buildList(path)
-    end 
-    @list.each_value do |file| 
-      listAllInclude(file)
-    end
+    @searchPath.each { |path| buildList(path) }
+    @list.each_value { |file| listAllInclude(file) }
   end
 
   def dump()
@@ -20,36 +16,28 @@ class IncludeList
     end
   end
 
-  def buildList(searchPath)
-    if not Dir.exist? searchPath
-      return
+  def getRelLines(path)
+    lines = readInclude(path)
+    allList = []
+    lines.map{ |line| getRealName(line)}
+      .each do |name|
+      if(@list.has_key?name )
+        allList << UsedInclude.new(false, @list[name])
+      else
+        #puts "#{name} not found in searchPath, in #{path} "
+      end
     end
+    return allList;
+  end
+
+  private
+  def buildList(searchPath)
+    return unless Dir.exist? searchPath
     files = Find.find(searchPath).select{ |file| (file =~ /(\.h)|(\.tcc)$/ ) }
     files.each do |file|
       obj = IncludeObj.new(file, searchPath);
       @list[obj.name] = obj
     end
-  end
-
-  def getInclude(shortName)
-    return @list[shortName]
-  end
-
-  def has(include, list)
-    return list.values.select{ |line| line.has(include) }.empty?
-  end
-
-  def getRelLines(lines)
-    allList = []
-    lines.map{ |line| getRealName(line)}
-      .each do |name|
-      if(@list.has_key?name )
-        allList << CppInclude.new(false, @list[name])
-      else
-        puts "#{name} not found in searchPath"
-      end
-    end
-    return allList;
   end
 
   def listAllInclude(file)

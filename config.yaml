@@ -1,6 +1,8 @@
-cpp_search_path:
+search_path:
  /Users/zhangchao/code/b57.6_opt/Code_LTE/rnlc/dcm/ng/src
-cpp_output_path:
+output_path:
     tmp
 cmake_path:
  /Users/zhangchao/code/b57.6_opt/
+file_type:
+ .cpp 

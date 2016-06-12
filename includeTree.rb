@@ -1,8 +1,7 @@
 require "find"
-require_relative "config.rb"
-require_relative "IncludeObj.rb" 
+require_relative "Config.rb"
 require_relative "IncludeList.rb" 
-require_relative "CppInfo.rb" 
+require_relative "PaserInfo.rb" 
 require_relative "Utils.rb" 
 
 class IncludeTree
@@ -11,30 +10,46 @@ class IncludeTree
     @list = IncludeList.new(config.include_search_path)
   end
 
-  def paserCpps()
-    cppOutList = []
-    cpplist = Find.find(@config.cpp_search_path).select{ |file| file =~ /\.cpp$/ }
-    cpplist.each do |file|
-      cppOutList << listAllInclude(file)
-    end
-    output(cppOutList)
+  def paser()
+    outList = getfiles.map{ |file| PaserInfo.new(file, @list) }
+    output(outList)
   end
 
   private
+
+  def getfiles
+    matcher = @config.getMatcher
+    return Find.find(@config.search_path).select{ |file| matcher.include(file) }
+  end
+
   def output(outList)
-    dst = File.new(@config.cpp_output_path, "w+")
+    dst = File.new(@config.output_path, "w+")
     list = outList.sort do |a, b| 
       a.sum <=> b.sum
     end
     list.each {|cpp| cpp.output(dst)}
     dst.close
   end
-
-  def listAllInclude(file)
-    CppInfo.new(file, @list)
-  end
-
 end
 
-tree = IncludeTree.new(IncludeTreeConfig.new)
-tree.paserCpps()
+
+
+$paser = lambda{|| IncludeTree.new(IncludeTreeConfig.new).paser}
+$help = lambda{|| p "this is a help"}
+options = {"help:"=>["give how to use", $help],
+           "paser"=> ["paser the file config in the config file", $paser]}
+
+ARGV.each do |arg| 
+  if options.each_key.include?(arg)
+    options[arg][1].call
+  else
+    p "#{arg} is not define in list"
+  end
+end
+if(ARGV.empty? )
+  p "Follow option is provided"
+  options.each do |var| 
+    p "#{var[0]} : #{var[1][0]} "
+  end
+end
+puts "====Current input arg is #{ARGV}===="

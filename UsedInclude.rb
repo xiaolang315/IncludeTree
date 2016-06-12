@@ -1,31 +1,28 @@
 require_relative "IncludeObj.rb" 
 
-class CppInclude
+class UsedInclude
   attr_reader:used
-  attr_reader:include
-  attr_accessor:includes
   def initialize(used, include)
     @used = used
-    @include = include
+    @file = include
     @includes  = []
   end
 
   def markuse(list)
-    @include.includes.each do |include| 
+    @file.includes.each do |include| 
       if(not list.include?(include))
         list << include
-        info = CppInclude.new(true, include)
-        info.markuse(list)
         @used = true
-        @includes << info
+        @includes << UsedInclude.new(true, include).markuse(list)
       else
-        @includes << CppInclude.new(false, include)
+        @includes << UsedInclude.new(false, include)
       end
     end
+    return self
   end
 
   def dump(dst, offset = "")
-    str = "#{offset} #{include.name}"
+    str = "#{offset} #{@file.name}"
     if(@used)
       str << " size is #{getSize}"
       if(not @includes.empty?)
@@ -36,21 +33,19 @@ class CppInclude
     end
     dst.puts str
     return unless @used
-    tmpoffset = ""
-    tmpoffset << offset + "   "
+    tmpoffset = offset + "   "
     @includes.each do | include| 
       include.dump(dst, tmpoffset)
     end
   end
 
   def getSize()
-    size = include.base_size
+    size = @file.base_size
     @includes.each do | include| 
-      if(include.used)
-        size += include.getSize 
-      end
+      size += include.getSize  unless include.used
     end
     return size
   end
 
 end
+ 
